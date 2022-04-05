@@ -10,13 +10,19 @@ using System.Windows.Forms;
 // ADDED
 using System.Collections.Concurrent;
 using System.IO;
+using FileShare;
 
 namespace Assignment6_Client
 {
+    // TO DO: Allow user to set username, pass username to server for relaying.
+    // 
+
     public partial class Form1 : Form
     {
         ClientCommunication serv;
         ConcurrentQueue<string> msgQ = new ConcurrentQueue<string>();
+
+        public string Username = "";
 
         private void DisplayMessages()
         {
@@ -45,11 +51,14 @@ namespace Assignment6_Client
             serv.ReceivedFile += Serv_ReceivedFile;
             serv.Connected += Serv_Connected;
             serv.ConnectionFailed += Serv_ConnectionFailed;
+
+            
         }
 
-        private void Serv_ReceivedFile(byte[] message)
+        private void Serv_ReceivedFile(SharedFile file)
         {
-            File.WriteAllBytes("hardcodedfilename.txt", message);
+            // Change to accept a SharedFile and decode it using it's original name
+            File.WriteAllBytes(file.FileName, file.FileBytes);
         }
 
         private void Serv_ConnectionFailed(string servername, int port)
@@ -63,6 +72,18 @@ namespace Assignment6_Client
         {
             string incomingConnectionMessage = ">>>> " + servername + "@" + port + " connected";
             msgQ.Enqueue(incomingConnectionMessage);
+
+            // Send username if provided
+            if (txtUsername.Text != "")
+            {
+                this.Username = txtUsername.Text;
+                Task.Delay(500);
+                serv.SendMessage("!user " + txtUsername.Text);
+            }
+
+            // disable username field
+            txtUsername.Enabled = false;
+            txtUsername.Visible = false;
         }
 
         private void Serv_ReceivedMessage(string message)
@@ -84,8 +105,10 @@ namespace Assignment6_Client
             OpenFileDialog diag = new OpenFileDialog();
             if (diag.ShowDialog() == DialogResult.OK)
             {
+                // turns file into a SharedFile and then sends it to the server
                 fileContents = File.ReadAllBytes(diag.FileName);
-                serv.SendMessage(fileContents);
+                SharedFile tmp = new SharedFile(this.Username, diag.FileName.Split('\\').LastOrDefault(), fileContents);
+                serv.SendMessage(tmp);
             }
         }
     }

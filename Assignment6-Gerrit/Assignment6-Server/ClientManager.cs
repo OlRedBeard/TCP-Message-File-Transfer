@@ -9,6 +9,7 @@ using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
 using System.ComponentModel;
+using FileShare;
 
 namespace Assignment6_Server
 {
@@ -37,7 +38,7 @@ namespace Assignment6_Server
         public delegate void ReceivedMessageEventHandler(ClientManager client, string message);
 
         public event ReceivedFileEventHandler ReceivedFile;
-        public delegate void ReceivedFileEventHandler(ClientManager client, byte[] file);
+        public delegate void ReceivedFileEventHandler(ClientManager client, SharedFile file);
 
         bool done = false;
 
@@ -64,7 +65,7 @@ namespace Assignment6_Server
             }
         }
 
-        public void SendFile(byte[] file)
+        public void SendFile(SharedFile file)
         {
             try
             {
@@ -99,7 +100,7 @@ namespace Assignment6_Server
                 // File was sent
                 else if (e.ProgressPercentage == 3)
                 {
-                    ReceivedFile(this, (byte[])e.UserState);
+                    ReceivedFile(this, (SharedFile)e.UserState);
                 }
             }
             catch
@@ -115,7 +116,8 @@ namespace Assignment6_Server
                 // This will wait for a new connection
                 connection = listener.AcceptSocket();
                 clientCounter++;
-                // Give them a name with their index
+
+                // Give them a name with their index (temporarily)
                 this.name = "Client" + clientCounter;
 
                 // Use the BGW to report progress (usually percent progress, instead will indicate the type of event)
@@ -139,11 +141,24 @@ namespace Assignment6_Server
                         // Here we check for the type of object
                         if(o is string)
                         {
-                            latest = (string)o;
-                            // 1 - new message
-                            bgw.ReportProgress(1, latest);
+                            string chk = o.ToString()[0].ToString();
+
+                            if (chk != "!")
+                            {
+                                latest = (string)o;
+                                // 1 - new message
+                                bgw.ReportProgress(1, latest);
+                            }
+                            else
+                            {
+                                // Logic for commands
+                                if (o.ToString().Split(" ")[0] == "!user")
+                                {
+                                    this.name = o.ToString().Split(" ")[1];
+                                }
+                            }                            
                         }
-                        if(o is byte[])
+                        if(o is SharedFile)
                         {
                             // 3 - new file
                             bgw.ReportProgress(3, o);

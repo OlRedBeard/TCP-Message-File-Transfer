@@ -11,6 +11,7 @@ using System.Windows.Forms;
 using System.Net.Sockets;
 using System.Net;
 using System.IO;
+using FileShare;
 
 namespace Assignment6_Server
 {
@@ -20,6 +21,7 @@ namespace Assignment6_Server
         TcpListener listener;
         ClientManager mngr;
         public static List<ClientManager> lstClients = new List<ClientManager>();
+        public static List<SharedFile> sharedFiles = new List<SharedFile>();
 
         public Form1()
         {
@@ -64,10 +66,10 @@ namespace Assignment6_Server
         }
         private void RelayAllFiles(byte[] message)
         {
-            foreach (ClientManager cli in lstClients)
-            {
-                cli.SendFile(message);
-            }
+            //foreach (ClientManager cli in lstClients)
+            //{
+            //    cli.SendFile(message);
+            //}
         }
 
         private void Mngr_ReceivedMessage(ClientManager client, string message)
@@ -85,11 +87,6 @@ namespace Assignment6_Server
             // Inform every client in the list that a client disconnected
             RelayAllMessages(client, msg);
             lstMessages.Items.Add(msg);
-
-            //mngr = new ClientManager(listener);
-            //mngr.NewClientConnected += Mngr_NewClientConnected;
-            //mngr.ClientDisconnected += Mngr_ClientDisconnected;
-            //mngr.ReceivedMessage += Mngr_ReceivedMessage;
         }
 
         private void Mngr_NewClientConnected(ClientManager client)
@@ -112,10 +109,12 @@ namespace Assignment6_Server
             mngr.ReceivedFile += Mngr_ReceivedFile;
         }
 
-        private void Mngr_ReceivedFile(ClientManager client, byte[] file)
+        private void Mngr_ReceivedFile(ClientManager client, SharedFile file)
         {
-            File.WriteAllBytes(client.name + "hardcodedfilename.txt", file);
-            RelayAllFiles(file);
+            sharedFiles.Add(file);
+            string filePath = Environment.CurrentDirectory + "/files/" + file.FileName;
+            file.SetPath(filePath);
+            File.WriteAllBytes(file.FilePath, file.FileBytes);
         }
     }
 }

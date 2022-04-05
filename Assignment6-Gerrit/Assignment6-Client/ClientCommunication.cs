@@ -10,6 +10,7 @@ using System.Runtime.Serialization.Formatters.Binary;
 using System.Net.Sockets;
 using System.IO;
 using System.Windows.Forms; // What?! This is now bound to Windows forms
+using FileShare;
 
 namespace Assignment6_Client
 {
@@ -35,7 +36,7 @@ namespace Assignment6_Client
         public delegate void ReceivedMessageEventHandler(string message);
 
         public event ReceivedFileEventHandler ReceivedFile;
-        public delegate void ReceivedFileEventHandler(byte[] message);
+        public delegate void ReceivedFileEventHandler(SharedFile file);
 
         public ClientCommunication(string servername)
         {
@@ -53,7 +54,7 @@ namespace Assignment6_Client
             formatter.Serialize(writer.BaseStream, msg);
         }
 
-        public void SendMessage(object msg)
+        public void SendMessage(SharedFile msg)
         {
             IFormatter formatter = new BinaryFormatter();
             formatter.Serialize(writer.BaseStream, msg);
@@ -85,10 +86,10 @@ namespace Assignment6_Client
                         if (o is string)
                         {
                             ReceivedMessage((string)o);
-                        }
-                        if (o is byte[])
+                        } // Change below to accept SharedFile
+                        if (o is SharedFile)
                         {
-                            ReceivedFile((byte[])o);
+                            ReceivedFile((SharedFile)o);
                         }
                         // TO DO: Receive a byte[] for a file
                     }

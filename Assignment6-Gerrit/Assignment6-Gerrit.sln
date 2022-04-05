@@ -1,11 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.31515.178
+# Visual Studio Version 17
+VisualStudioVersion = 17.1.32328.378
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Assignment6-Server", "Assignment6-Server\Assignment6-Server.csproj", "{E8CC0CA5-7475-42C8-82F3-81B246C2C6E8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Assignment6-Server", "Assignment6-Server\Assignment6-Server.csproj", "{E8CC0CA5-7475-42C8-82F3-81B246C2C6E8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Assignment6-Client", "Assignment6-Client\Assignment6-Client.csproj", "{2C139BE8-5139-4FEF-93D9-30DE67B10B48}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Assignment6-Client", "Assignment6-Client\Assignment6-Client.csproj", "{2C139BE8-5139-4FEF-93D9-30DE67B10B48}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileShare", "FileShare\FileShare.csproj", "{FC8128D7-DE1B-4BB8-B2A1-AA6B0DF48D66}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{2C139BE8-5139-4FEF-93D9-30DE67B10B48}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2C139BE8-5139-4FEF-93D9-30DE67B10B48}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2C139BE8-5139-4FEF-93D9-30DE67B10B48}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FC8128D7-DE1B-4BB8-B2A1-AA6B0DF48D66}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FC8128D7-DE1B-4BB8-B2A1-AA6B0DF48D66}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FC8128D7-DE1B-4BB8-B2A1-AA6B0DF48D66}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FC8128D7-DE1B-4BB8-B2A1-AA6B0DF48D66}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
