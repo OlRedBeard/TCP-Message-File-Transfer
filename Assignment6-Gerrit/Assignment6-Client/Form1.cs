@@ -41,7 +41,7 @@ namespace Assignment6_Client
 
         private void Form1_Load(object sender, EventArgs e)
         {
-
+            cmbIPaddress.SelectedIndex = 0;
         }
 
         private void btnConnect_Click(object sender, EventArgs e)
@@ -52,7 +52,13 @@ namespace Assignment6_Client
             serv.Connected += Serv_Connected;
             serv.ConnectionFailed += Serv_ConnectionFailed;
 
-            
+            // Send username if provided
+            if (txtUsername.Text != "")
+                this.Username = txtUsername.Text;
+
+            // disable username field
+            txtUsername.Enabled = false;
+            txtUsername.Visible = false;
         }
 
         private void Serv_ReceivedFile(SharedFile file)
@@ -74,16 +80,11 @@ namespace Assignment6_Client
             msgQ.Enqueue(incomingConnectionMessage);
 
             // Send username if provided
-            if (txtUsername.Text != "")
-            {
-                this.Username = txtUsername.Text;
-                Task.Delay(500);
-                serv.SendMessage("!user " + txtUsername.Text);
-            }
+            if (this.Username != "")
+                serv.SendMessage("!user " + this.Username);
 
-            // disable username field
-            txtUsername.Enabled = false;
-            txtUsername.Visible = false;
+            string helpMessage = ">>>> Send !help for a list of commands";
+            msgQ.Enqueue(incomingConnectionMessage);
         }
 
         private void Serv_ReceivedMessage(string message)

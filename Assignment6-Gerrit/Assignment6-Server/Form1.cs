@@ -46,14 +46,47 @@ namespace Assignment6_Server
                 mngr = new ClientManager(listener);
                 mngr.NewClientConnected += Mngr_NewClientConnected;
                 mngr.ClientDisconnected += Mngr_ClientDisconnected;
+                mngr.ClientRenamed += Mngr_ClientRenamed;
                 mngr.ReceivedMessage += Mngr_ReceivedMessage;
                 mngr.ReceivedFile += Mngr_ReceivedFile;
+                mngr.PrivateMessaged += Mngr_PrivateMessaged;
+                mngr.ListRequested += Mngr_ListRequested;
+                mngr.FileRequested += Mngr_FileRequested;
 
                 lstMessages.Items.Add(">>>> Server has started");
             }
             catch
             {
                 throw;
+            }
+        }
+
+        private void DownloadFile(ClientManager client, SharedFile file)
+        {
+            for (int i = 0; i < lstClients.Count; i++)
+            {
+                if (lstClients[i].name == client.name)
+                    lstClients[i].SendFile(file);
+            }
+        }
+
+        private void SendPrivateMessage(ClientManager? sender, ClientManager receiver, string msg)
+        {
+            if (sender == null)
+            {
+                for (int i = 0; i < lstClients.Count; i++)
+                {
+                    if (lstClients[i].name == receiver.name)
+                        lstClients[i].SendMessage("||| " + msg);
+                }
+            }
+            else
+            {
+                for (int i = 0; i < lstClients.Count; i++)
+                {
+                    if (lstClients[i].name == receiver.name) // Is this right?
+                        lstClients[i].SendMessage("||| " + sender.name + ": " + msg + " |||");
+                }
             }
         }
 
@@ -64,18 +97,71 @@ namespace Assignment6_Server
                 cli.SendMessage(sendClient.name + ": " + message);
             }
         }
-        private void RelayAllFiles(byte[] message)
+
+        private void ServerMessage(string message)
         {
-            //foreach (ClientManager cli in lstClients)
-            //{
-            //    cli.SendFile(message);
-            //}
+            foreach (ClientManager cli in lstClients)
+            {
+                cli.SendMessage(message);
+            }
+        }
+        private void Mngr_FileRequested(ClientManager client, string fileName)
+        {
+            for (int i = 0; i < sharedFiles.Count; i++)
+            {
+                if (sharedFiles[i].FileName == fileName)
+                {
+                    SharedFile requested = sharedFiles[i];
+                    DownloadFile(client, requested);
+                }
+                else
+                {
+                    SendPrivateMessage(null, client, "File not found, check spelling.");
+                }    
+            }
+        }
+
+        private void Mngr_ListRequested(ClientManager client)
+        {
+            if (sharedFiles.Count == 0)
+                SendPrivateMessage(null, client, "There are no shared files yet");
+            else
+            {
+                foreach (SharedFile tmp in sharedFiles)
+                {
+                    string msg = tmp.ToString();
+                    SendPrivateMessage(null, client, msg);
+                }
+            }            
+        }
+
+        private void Mngr_PrivateMessaged(ClientManager? sender, ClientManager receiver, string message)
+        {
+            if (sender != null)
+            {
+                SendPrivateMessage(sender, receiver, message);
+                lstMessages.Items.Add(sender.name + " private messaged " + receiver.name);
+            }
+            else
+            {
+                SendPrivateMessage(sender, receiver, message);
+                lstMessages.Items.Add("Server responded to a request from " + receiver.name);
+            }
         }
 
         private void Mngr_ReceivedMessage(ClientManager client, string message)
         {
             RelayAllMessages(client, message);
             lstMessages.Items.Add(client.name + ": " + message);
+        }
+
+        private void Mngr_ClientRenamed(ClientManager client, string oldName)
+        {
+            string msg = ">>>> " + oldName + " was renamed " + client.name + ".";
+
+            // Inform every client in the list that a client disconnected
+            ServerMessage(msg);
+            lstMessages.Items.Add(msg);
         }
 
         private void Mngr_ClientDisconnected(ClientManager client)
@@ -85,7 +171,7 @@ namespace Assignment6_Server
             string msg = ">>>> " + client.name + " has disconnected.";
 
             // Inform every client in the list that a client disconnected
-            RelayAllMessages(client, msg);
+            ServerMessage(msg);
             lstMessages.Items.Add(msg);
         }
 
@@ -96,11 +182,7 @@ namespace Assignment6_Server
             string msg = ">>>> " + client.name + " has connected.";
 
             // Inform every client in the list that a new client connected
-            foreach(ClientManager cli in lstClients)
-            {
-                cli.SendMessage(msg);
-            }
-            lstMessages.Items.Add(msg);
+            ServerMessage(msg);
 
             mngr = new ClientManager(listener);
             mngr.NewClientConnected += Mngr_NewClientConnected;

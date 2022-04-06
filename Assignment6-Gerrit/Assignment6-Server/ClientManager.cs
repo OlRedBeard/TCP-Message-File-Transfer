@@ -16,8 +16,19 @@ namespace Assignment6_Server
     public class ClientManager
     {
         public string name = "";
+        public string oldName = "";
+
         // Keep a string around for the latest message
         private string latest = "";
+
+        // List of commands
+        private string[] commands = { 
+            "!help - Get a list of available commands.",
+            "!list - Displays a list of shared files.",
+            "!get [filename] - Download a shared file.",
+            "!user [newname] - Change your display name to [newname].", 
+            ""
+        };
 
         public static TcpListener listener;
         public static int clientCounter = 0;
@@ -34,11 +45,23 @@ namespace Assignment6_Server
         public event ClientDisconnectedEventHandler ClientDisconnected;
         public delegate void ClientDisconnectedEventHandler(ClientManager client);
 
+        public event ClientRenameEventHandler ClientRenamed;
+        public delegate void ClientRenameEventHandler(ClientManager client, string oldName);
+
         public event ReceivedMessageEventHandler ReceivedMessage;
         public delegate void ReceivedMessageEventHandler(ClientManager client, string message);
 
         public event ReceivedFileEventHandler ReceivedFile;
         public delegate void ReceivedFileEventHandler(ClientManager client, SharedFile file);
+
+        public event PrivateMessageEventHandler PrivateMessaged;
+        public delegate void PrivateMessageEventHandler(ClientManager? sender, ClientManager receiver, string message);
+
+        public event ListEventHandler ListRequested;
+        public delegate void ListEventHandler(ClientManager client);
+
+        public event GetEventHandler FileRequested;
+        public delegate void GetEventHandler(ClientManager client, string fileName);
 
         bool done = false;
 
@@ -102,6 +125,29 @@ namespace Assignment6_Server
                 {
                     ReceivedFile(this, (SharedFile)e.UserState);
                 }
+                // Client changed username
+                else if (e.ProgressPercentage == 4)
+                {
+                    ClientRenamed(this, this.oldName); // ERROR! SECOND USER CAUSES CRASH WHEN CHANGING NAME
+                }
+                // Help request
+                else if (e.ProgressPercentage == 5)
+                {
+                    foreach (string msg in commands)
+                    {
+                        PrivateMessaged(null, this, msg);
+                    }
+                }
+                // File list request
+                else if (e.ProgressPercentage == 6)
+                {
+                    ListRequested(this);
+                }
+                // Get file request
+                else if (e.ProgressPercentage == 7)
+                {
+                    FileRequested(this, (string)e.UserState);
+                }
             }
             catch
             {
@@ -154,7 +200,26 @@ namespace Assignment6_Server
                                 // Logic for commands
                                 if (o.ToString().Split(" ")[0] == "!user")
                                 {
+                                    this.oldName = this.name;
                                     this.name = o.ToString().Split(" ")[1];
+                                    // 4 - username change
+                                    bgw.ReportProgress(4);
+                                }
+                                else if (o.ToString().Split(" ")[0] == "!help")
+                                {
+                                    // 5 - help request
+                                    bgw.ReportProgress(5);
+                                }
+                                else if (o.ToString().Split(" ")[0] == "!list")
+                                {
+                                    // 5 - file list request
+                                    bgw.ReportProgress(6);
+                                }
+                                else if (o.ToString().Split(" ")[0] == "!get")
+                                {
+                                    latest = o.ToString().Split(" ")[1];
+                                    // 6 - download request
+                                    bgw.ReportProgress(7, latest);
                                 }
                             }                            
                         }

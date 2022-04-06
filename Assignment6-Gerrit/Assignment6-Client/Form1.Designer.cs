@@ -62,6 +62,8 @@ namespace Assignment6_Client
             // cmbIPaddress
             // 
             this.cmbIPaddress.FormattingEnabled = true;
+            this.cmbIPaddress.Items.AddRange(new object[] {
+            "172.18.28.116"});
             this.cmbIPaddress.Location = new System.Drawing.Point(79, 12);
             this.cmbIPaddress.Name = "cmbIPaddress";
             this.cmbIPaddress.Size = new System.Drawing.Size(309, 23);
