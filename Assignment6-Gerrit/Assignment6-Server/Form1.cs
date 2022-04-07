@@ -32,6 +32,23 @@ namespace Assignment6_Server
         {
             cmbIPaddress.DataSource = Dns.GetHostEntry(SystemInformation.ComputerName).AddressList
                 .Where(x => x.AddressFamily == AddressFamily.InterNetwork).ToList();
+
+            if(!Directory.Exists(Environment.CurrentDirectory + "/files/"))
+            {
+                Directory.CreateDirectory(Environment.CurrentDirectory + "/files/");
+            }
+            else
+            {
+                string[] allFiles = Directory.GetFiles(Environment.CurrentDirectory + "/files/");
+
+                foreach(string file in allFiles)
+                {
+                    byte[] fileContents = File.ReadAllBytes(file);
+                    string fname = file.Split("/").LastOrDefault();
+                    SharedFile tmp = new SharedFile("Serv", fname, fileContents);
+                    sharedFiles.Add(tmp);
+                }
+            }
         }
 
         private void btnStart_Click(object sender, EventArgs e)
@@ -70,7 +87,7 @@ namespace Assignment6_Server
             }
         }
 
-        private void SendPrivateMessage(ClientManager? sender, ClientManager receiver, string msg)
+        private void SendPrivateMessage(string? sender, ClientManager receiver, string msg)
         {
             if (sender == null)
             {
@@ -84,8 +101,8 @@ namespace Assignment6_Server
             {
                 for (int i = 0; i < lstClients.Count; i++)
                 {
-                    if (lstClients[i].name == receiver.name) // Is this right?
-                        lstClients[i].SendMessage("||| " + sender.name + ": " + msg + " |||");
+                    if (lstClients[i].name == sender) // Is this right?
+                        lstClients[i].SendMessage("||| " + receiver.name + ": " + msg);
                 }
             }
         }
@@ -135,12 +152,12 @@ namespace Assignment6_Server
             }            
         }
 
-        private void Mngr_PrivateMessaged(ClientManager? sender, ClientManager receiver, string message)
+        private void Mngr_PrivateMessaged(string? sender, ClientManager receiver, string message)
         {
             if (sender != null)
             {
                 SendPrivateMessage(sender, receiver, message);
-                lstMessages.Items.Add(sender.name + " private messaged " + receiver.name);
+                lstMessages.Items.Add(sender + " private messaged " + receiver.name);
             }
             else
             {
@@ -187,16 +204,39 @@ namespace Assignment6_Server
             mngr = new ClientManager(listener);
             mngr.NewClientConnected += Mngr_NewClientConnected;
             mngr.ClientDisconnected += Mngr_ClientDisconnected;
+            mngr.ClientRenamed += Mngr_ClientRenamed;
             mngr.ReceivedMessage += Mngr_ReceivedMessage;
             mngr.ReceivedFile += Mngr_ReceivedFile;
+            mngr.PrivateMessaged += Mngr_PrivateMessaged;
+            mngr.ListRequested += Mngr_ListRequested;
+            mngr.FileRequested += Mngr_FileRequested;
         }
 
         private void Mngr_ReceivedFile(ClientManager client, SharedFile file)
         {
             sharedFiles.Add(file);
             string filePath = Environment.CurrentDirectory + "/files/" + file.FileName;
+            int counter = 0;
+
+            while (File.Exists(filePath))
+            {
+                if (file.FileName.Contains($"({counter})"))
+                {
+                    counter++;
+                    file.FileName = file.FileName.Split('(')[0] + $@"({counter})" + file.FileName.Split(')')[1];
+                }
+                else
+                {
+                    file.FileName = file.FileName.Split('.')[0] + $@"({counter})." + file.FileName.Split('.')[1];
+                }
+                
+                filePath = Environment.CurrentDirectory + "/files/" + file.FileName;
+                //counter++;
+            }
+
             file.SetPath(filePath);
             File.WriteAllBytes(file.FilePath, file.FileBytes);
+            lstMessages.Items.Add(">>>> " + client.name + " uploaded " + file.FileName);
         }
     }
 }

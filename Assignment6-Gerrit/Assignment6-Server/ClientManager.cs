@@ -27,7 +27,7 @@ namespace Assignment6_Server
             "!list - Displays a list of shared files.",
             "!get [filename] - Download a shared file.",
             "!user [newname] - Change your display name to [newname].", 
-            ""
+            "!shh [username] - Send a private message to [username]"
         };
 
         public static TcpListener listener;
@@ -55,7 +55,7 @@ namespace Assignment6_Server
         public delegate void ReceivedFileEventHandler(ClientManager client, SharedFile file);
 
         public event PrivateMessageEventHandler PrivateMessaged;
-        public delegate void PrivateMessageEventHandler(ClientManager? sender, ClientManager receiver, string message);
+        public delegate void PrivateMessageEventHandler(string? sender, ClientManager receiver, string message);
 
         public event ListEventHandler ListRequested;
         public delegate void ListEventHandler(ClientManager client);
@@ -128,7 +128,7 @@ namespace Assignment6_Server
                 // Client changed username
                 else if (e.ProgressPercentage == 4)
                 {
-                    ClientRenamed(this, this.oldName); // ERROR! SECOND USER CAUSES CRASH WHEN CHANGING NAME
+                    ClientRenamed(this, this.oldName);
                 }
                 // Help request
                 else if (e.ProgressPercentage == 5)
@@ -147,6 +147,15 @@ namespace Assignment6_Server
                 else if (e.ProgressPercentage == 7)
                 {
                     FileRequested(this, (string)e.UserState);
+                }
+                // Private message
+                else if (e.ProgressPercentage == 8)
+                {
+                    string unsplitted = (string)e.UserState;
+                    string msg = unsplitted.Split(',')[1];
+                    string receiver = unsplitted.Split(',')[0];
+
+                    PrivateMessaged(receiver, this, msg);
                 }
             }
             catch
@@ -212,14 +221,24 @@ namespace Assignment6_Server
                                 }
                                 else if (o.ToString().Split(" ")[0] == "!list")
                                 {
-                                    // 5 - file list request
+                                    // 6 - file list request
                                     bgw.ReportProgress(6);
                                 }
                                 else if (o.ToString().Split(" ")[0] == "!get")
                                 {
                                     latest = o.ToString().Split(" ")[1];
-                                    // 6 - download request
+                                    // 7 - download request
                                     bgw.ReportProgress(7, latest);
+                                }
+                                else if (o.ToString().Split(" ")[0] == "!shh")
+                                {
+                                    latest = o.ToString().Split(" ")[1] + ",";
+                                    for (int i = 2; i < o.ToString().Split(" ").Length; i++)
+                                    {
+                                        latest += o.ToString().Split(" ")[i] + " ";
+                                    }
+                                    // 8 - private message
+                                    bgw.ReportProgress(8, latest);
                                 }
                             }                            
                         }
