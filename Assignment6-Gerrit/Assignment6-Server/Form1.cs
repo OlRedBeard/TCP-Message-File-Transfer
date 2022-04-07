@@ -124,17 +124,19 @@ namespace Assignment6_Server
         }
         private void Mngr_FileRequested(ClientManager client, string fileName)
         {
+            SharedFile requested = null;
             for (int i = 0; i < sharedFiles.Count; i++)
             {
                 if (sharedFiles[i].FileName == fileName)
                 {
-                    SharedFile requested = sharedFiles[i];
+                    requested = sharedFiles[i];
                     DownloadFile(client, requested);
                 }
-                else
-                {
-                    SendPrivateMessage(null, client, "File not found, check spelling.");
-                }    
+            }
+
+            if (requested == null)
+            {
+                SendPrivateMessage(null, client, "File not found, check spelling.");
             }
         }
 

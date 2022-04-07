@@ -65,12 +65,14 @@ namespace Assignment6_Client
         {
             // Change to accept a SharedFile and decode it using it's original name
             File.WriteAllBytes(file.FileName, file.FileBytes);
+            msgQ.Enqueue(">>>> Dowloaded " + file.FileName);
+            this.BeginInvoke(new MethodInvoker(DisplayMessages));
         }
 
         private void Serv_ConnectionFailed(string servername, int port)
         {
             //throw new NotImplementedException();
-            msgQ.Enqueue("Connection lost: " + servername + "@" + port);
+            msgQ.Enqueue(">>>> Connection lost: " + servername + "@" + port);
             this.BeginInvoke(new MethodInvoker(DisplayMessages));
         }
 
