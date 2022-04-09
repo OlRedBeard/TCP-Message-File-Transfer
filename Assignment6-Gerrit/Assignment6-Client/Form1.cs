@@ -14,9 +14,6 @@ using FileShare;
 
 namespace Assignment6_Client
 {
-    // TO DO: Allow user to set username, pass username to server for relaying.
-    // 
-
     public partial class Form1 : Form
     {
         ClientCommunication serv;
@@ -31,6 +28,7 @@ namespace Assignment6_Client
                 string tmp;
                 msgQ.TryDequeue(out tmp);
                 lstMessages.Items.Add(tmp);
+                lstMessages.SelectedIndex = lstMessages.Items.Count - 1;
             }
         }
 
@@ -80,6 +78,7 @@ namespace Assignment6_Client
         {
             string incomingConnectionMessage = ">>>> " + servername + "@" + port + " connected";
             msgQ.Enqueue(incomingConnectionMessage);
+            this.BeginInvoke(new MethodInvoker(DisplayMessages));
 
             // Send username if provided
             if (this.Username != "")
@@ -87,6 +86,7 @@ namespace Assignment6_Client
 
             string helpMessage = ">>>> Send !help for a list of commands";
             msgQ.Enqueue(incomingConnectionMessage);
+            this.BeginInvoke(new MethodInvoker(DisplayMessages));
         }
 
         private void Serv_ReceivedMessage(string message)
@@ -98,6 +98,16 @@ namespace Assignment6_Client
         private void btnSend_Click(object sender, EventArgs e)
         {
             serv.SendMessage(txtMessage.Text);
+            if (txtMessage.Text.Split(" ")[0] == "!shh")
+            {
+                string message = "";
+                for (int i = 2; i < txtMessage.Text.Split(" ").Length; i++)
+                {
+                    message += txtMessage.Text.Split(" ")[i] + " ";
+                }
+                msgQ.Enqueue("|||>To " + txtMessage.Text.Split(" ")[1] + ": " + message);
+                this.BeginInvoke(new MethodInvoker(DisplayMessages));
+            }
             txtMessage.Text = "";
         }
 

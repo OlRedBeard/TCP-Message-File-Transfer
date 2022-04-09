@@ -38,25 +38,28 @@ namespace Assignment6_Server
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(12, 15);
+            this.label1.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.label1.Location = new System.Drawing.Point(12, 18);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(62, 15);
+            this.label1.Size = new System.Drawing.Size(86, 21);
             this.label1.TabIndex = 0;
-            this.label1.Text = "IP Address";
+            this.label1.Text = "IP Address:";
             // 
             // cmbIPaddress
             // 
+            this.cmbIPaddress.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this.cmbIPaddress.FormattingEnabled = true;
-            this.cmbIPaddress.Location = new System.Drawing.Point(80, 12);
+            this.cmbIPaddress.Location = new System.Drawing.Point(132, 14);
             this.cmbIPaddress.Name = "cmbIPaddress";
-            this.cmbIPaddress.Size = new System.Drawing.Size(309, 23);
+            this.cmbIPaddress.Size = new System.Drawing.Size(309, 29);
             this.cmbIPaddress.TabIndex = 1;
             // 
             // btnStart
             // 
-            this.btnStart.Location = new System.Drawing.Point(314, 41);
+            this.btnStart.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.btnStart.Location = new System.Drawing.Point(488, 12);
             this.btnStart.Name = "btnStart";
-            this.btnStart.Size = new System.Drawing.Size(75, 23);
+            this.btnStart.Size = new System.Drawing.Size(75, 31);
             this.btnStart.TabIndex = 2;
             this.btnStart.Text = "Start";
             this.btnStart.UseVisualStyleBackColor = true;
@@ -64,18 +67,19 @@ namespace Assignment6_Server
             // 
             // lstMessages
             // 
+            this.lstMessages.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this.lstMessages.FormattingEnabled = true;
-            this.lstMessages.ItemHeight = 15;
-            this.lstMessages.Location = new System.Drawing.Point(12, 70);
+            this.lstMessages.ItemHeight = 21;
+            this.lstMessages.Location = new System.Drawing.Point(12, 64);
             this.lstMessages.Name = "lstMessages";
-            this.lstMessages.Size = new System.Drawing.Size(377, 364);
+            this.lstMessages.Size = new System.Drawing.Size(551, 319);
             this.lstMessages.TabIndex = 3;
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(800, 450);
+            this.ClientSize = new System.Drawing.Size(575, 398);
             this.Controls.Add(this.lstMessages);
             this.Controls.Add(this.btnStart);
             this.Controls.Add(this.cmbIPaddress);

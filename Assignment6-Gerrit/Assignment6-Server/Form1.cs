@@ -71,6 +71,7 @@ namespace Assignment6_Server
                 mngr.FileRequested += Mngr_FileRequested;
 
                 lstMessages.Items.Add(">>>> Server has started");
+                lstMessages.SelectedIndex = lstMessages.Items.Count -1;
             }
             catch
             {
@@ -160,11 +161,13 @@ namespace Assignment6_Server
             {
                 SendPrivateMessage(sender, receiver, message);
                 lstMessages.Items.Add(sender + " private messaged " + receiver.name);
+                lstMessages.SelectedIndex = lstMessages.Items.Count - 1;
             }
             else
             {
                 SendPrivateMessage(sender, receiver, message);
                 lstMessages.Items.Add("Server responded to a request from " + receiver.name);
+                lstMessages.SelectedIndex = lstMessages.Items.Count - 1;
             }
         }
 
@@ -172,6 +175,7 @@ namespace Assignment6_Server
         {
             RelayAllMessages(client, message);
             lstMessages.Items.Add(client.name + ": " + message);
+            lstMessages.SelectedIndex = lstMessages.Items.Count - 1;
         }
 
         private void Mngr_ClientRenamed(ClientManager client, string oldName)
@@ -181,6 +185,7 @@ namespace Assignment6_Server
             // Inform every client in the list that a client disconnected
             ServerMessage(msg);
             lstMessages.Items.Add(msg);
+            lstMessages.SelectedIndex = lstMessages.Items.Count - 1;
         }
 
         private void Mngr_ClientDisconnected(ClientManager client)
@@ -192,6 +197,7 @@ namespace Assignment6_Server
             // Inform every client in the list that a client disconnected
             ServerMessage(msg);
             lstMessages.Items.Add(msg);
+            lstMessages.SelectedIndex = lstMessages.Items.Count - 1;
         }
 
         private void Mngr_NewClientConnected(ClientManager client)
@@ -239,6 +245,7 @@ namespace Assignment6_Server
             file.SetPath(filePath);
             File.WriteAllBytes(file.FilePath, file.FileBytes);
             lstMessages.Items.Add(">>>> " + client.name + " uploaded " + file.FileName);
+            lstMessages.SelectedIndex = lstMessages.Items.Count - 1;
         }
     }
 }
