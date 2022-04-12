@@ -63,7 +63,7 @@ namespace Assignment6_Client
         {
             // Change to accept a SharedFile and decode it using it's original name
             File.WriteAllBytes(file.FileName, file.FileBytes);
-            msgQ.Enqueue(">>>> Dowloaded " + file.FileName);
+            msgQ.Enqueue(">>>> Downloaded " + file.FileName);
             this.BeginInvoke(new MethodInvoker(DisplayMessages));
         }
 
