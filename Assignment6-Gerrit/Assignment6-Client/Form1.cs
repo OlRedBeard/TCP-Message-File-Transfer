@@ -39,7 +39,7 @@ namespace Assignment6_Client
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            cmbIPaddress.SelectedIndex = 0;
+            
         }
 
         private void btnConnect_Click(object sender, EventArgs e)
